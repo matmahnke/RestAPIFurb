@@ -1,0 +1,9 @@
+DTO/bin/
+DTO/obj/
+Infra/bin/
+Infra/obj/
+WebAPI/bin/
+WebAPI/obj/
+*.dll
+*.exe
+*.vs

@@ -1,6 +1,6 @@
 # Implementação de uma API rest em .NET Core 2.1
 
-#Itegrantes
+# Integrantes
 > Alan Felipe Jantz e Matheus Mahnke
 
 Documentação da api com:

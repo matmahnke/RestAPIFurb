@@ -83,6 +83,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Inserir([FromBody]UsuarioViewModel usuario)
         {
             try

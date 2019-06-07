@@ -5,5 +5,6 @@ Infra/obj/
 WebAPI/bin/
 WebAPI/obj/
 *.dll
+*.pdb
 *.exe
 *.vs

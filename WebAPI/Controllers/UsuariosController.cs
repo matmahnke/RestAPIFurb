@@ -4,11 +4,16 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BusinessRules;
+using BusinessRules.Interfaces;
+using DTO;
 using Infra;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
+using WebAPI.Services;
 
 namespace WebAPI.Controllers
 {
@@ -16,13 +21,38 @@ namespace WebAPI.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
+        private IUserService _userService;
+        private readonly IUsuarioService _service;
+
+        public UsuariosController(IUserService userService, IUsuarioService service)
+        {
+            _userService = userService;
+            _service = service;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("auth")]
+        public async Task<IActionResult> Authenticate([FromBody]UsuarioViewModel userParam)
+        {
+            var user = await _userService.Authenticate(userParam.Email, userParam.Senha);
+
+            if (user == null)
+                return BadRequest(new { message = "Usuário ou senha estão incorrect" });
+
+            return Ok(user);
+        }
 
         [HttpGet]
         public IActionResult BuscarTodos()
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                return Ok(context.Usuarios.AsNoTracking().ToList());
+                var result = _service.GetAll();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
@@ -30,24 +60,28 @@ namespace WebAPI.Controllers
         [Route("{id}")]
         public async Task<IActionResult> BuscarPorId(int id)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                return Ok(await context.Usuarios.FirstOrDefaultAsync(u => u.Id == id));
+                var result = _service.GetById(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody]UsuarioViewModel usuario)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = await context.Usuarios.AddAsync(new DTO.Usuario
-                {
-                    Email = usuario.Email,
-                    Senha = usuario.Senha
-                });
-                await context.SaveChangesAsync();
+                var result = await _service.Insert(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
@@ -55,28 +89,29 @@ namespace WebAPI.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Editar(int id, [FromBody]UsuarioViewModel usuario)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = context.Usuarios.Update(new DTO.Usuario
-                {
-                    Id = usuario.Id.Value,
-                    Email = usuario.Email,
-                    Senha = usuario.Senha
-                });
-                await context.SaveChangesAsync();
+                var result = await _service.Update(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> Deletar(int id)
+        public IActionResult Deletar(int id)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = context.Usuarios.Remove(await context.Usuarios.FirstAsync(c => c.Id == id));
-                await context.SaveChangesAsync();
+                var result = _service.Delete(id);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
@@ -84,11 +119,14 @@ namespace WebAPI.Controllers
         [Route("{email}")]
         public async Task<IActionResult> Deletar(string email)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = context.Usuarios.Remove(await context.Usuarios.FirstAsync(c => c.Email == email));
-                await context.SaveChangesAsync();
+                var result = _service.Delete(email);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
     }

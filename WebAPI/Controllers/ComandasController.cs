@@ -1,7 +1,10 @@
-﻿using DTO;
+﻿using BusinessRules;
+using BusinessRules.Interfaces;
+using DTO;
 using Infra;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Models;
@@ -12,12 +15,23 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ComandasController : ControllerBase
     {
+        private readonly IComandaService _service;
+
+        public ComandasController(IComandaService service)
+        {
+            _service = service;
+        }
         [HttpGet]
         public IActionResult BuscarTodos()
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                return Ok(context.Comandas.AsNoTracking().ToList());
+                var result = _service.GetAll();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
@@ -25,55 +39,58 @@ namespace WebAPI.Controllers
         [Route("{id}")]
         public async Task<IActionResult> BuscarPorId(int id)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                return Ok(await context.Comandas.FirstOrDefaultAsync(u => u.Id == id));
+                var result = _service.GetById(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody]ComandaViewModel comanda)
+        public async Task<IActionResult> Inserir([FromBody]ComandaViewModel Comanda)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = await context.Comandas.AddAsync(new Comanda
-                {
-                    IdUsuario = comanda.IdUsuario,
-                    Produtos = comanda.Produtos,
-                    ValorTotal = comanda.ValorTotal
-                });
-                await context.SaveChangesAsync();
+                var result = await _service.Insert(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> Editar(int id, [FromBody]ComandaViewModel comanda)
+        public async Task<IActionResult> Editar(int id, [FromBody]ComandaViewModel Comanda)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var result = context.Comandas.Update(new Comanda
-                {
-                    Id = comanda.Id.Value,
-                    IdUsuario = comanda.IdUsuario,
-                    Produtos = comanda.Produtos,
-                    ValorTotal = comanda.ValorTotal
-                });
-                await context.SaveChangesAsync();
+                var result = await _service.Update(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> Deletar(int id)
+        public IActionResult Deletar(int id)
         {
-            using (var context = new ApplicationDbContext())
+            try
             {
-                var comanda = context.Comandas.Remove(await context.Comandas.FirstAsync(c => c.Id == id));
-                await context.SaveChangesAsync();
-                return Ok(comanda);
+                var result = _service.Delete(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
         }
     }

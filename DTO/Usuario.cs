@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DTO
 {
-    public class Usuario
+    public class Usuario : Entity
     {
         [Key]
         public int Id { get; set; }
@@ -14,6 +14,5 @@ namespace DTO
         [Required]
         [MaxLength(30)]
         public string Senha { get; set; }
-        public virtual ICollection<Comanda> Comandas { get; set; }
     }
 }

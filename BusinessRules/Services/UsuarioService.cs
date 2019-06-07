@@ -61,6 +61,15 @@ namespace BusinessRules.Services
             }
         }
 
+        public Usuario Filter(string email, string senha)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var result = context.Usuarios.FirstOrDefault(c => c.Email == email && c.Senha == senha);
+                return result;
+            }
+        }
+
         public async Task<Usuario> Insert(Usuario usuario)
         {
             Validate(usuario);

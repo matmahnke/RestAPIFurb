@@ -2,6 +2,8 @@
 using BusinessRules.Interfaces;
 using DTO;
 using Infra;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +14,7 @@ using WebAPI.Models;
 namespace WebAPI.Controllers
 {
     [Route("RestAPIFurb/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     public class ComandasController : ControllerBase
     {
@@ -29,6 +32,10 @@ namespace WebAPI.Controllers
                 var result = _service.GetAll();
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -44,6 +51,10 @@ namespace WebAPI.Controllers
                 var result = _service.GetById(id);
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -57,6 +68,10 @@ namespace WebAPI.Controllers
             {
                 var result = await _service.Insert(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
                 return Ok(result);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -73,6 +88,10 @@ namespace WebAPI.Controllers
                 var result = await _service.Update(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -87,6 +106,10 @@ namespace WebAPI.Controllers
             {
                 var result = _service.Delete(id);
                 return Ok(result);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

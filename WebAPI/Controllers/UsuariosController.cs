@@ -8,10 +8,12 @@ using BusinessRules;
 using BusinessRules.Interfaces;
 using DTO;
 using Infra;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Helpers;
 using WebAPI.Models;
 using WebAPI.Services;
 
@@ -19,6 +21,7 @@ namespace WebAPI.Controllers
 {
     [Route("RestAPIFurb/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsuariosController : ControllerBase
     {
         private IUserService _userService;
@@ -37,7 +40,7 @@ namespace WebAPI.Controllers
             var user = await _userService.Authenticate(userParam.Email, userParam.Senha);
 
             if (user == null)
-                return BadRequest(new { message = "Usuário ou senha estão incorrect" });
+                return BadRequest(new { message = "Usuário ou senha estão incorretos" });
 
             return Ok(user);
         }
@@ -49,6 +52,10 @@ namespace WebAPI.Controllers
             {
                 var result = _service.GetAll();
                 return Ok(result);
+            }
+            catch(BusinessException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -65,6 +72,10 @@ namespace WebAPI.Controllers
                 var result = _service.GetById(id);
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -78,6 +89,10 @@ namespace WebAPI.Controllers
             {
                 var result = await _service.Insert(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
                 return Ok(result);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -94,6 +109,10 @@ namespace WebAPI.Controllers
                 var result = await _service.Update(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -109,6 +128,10 @@ namespace WebAPI.Controllers
                 var result = _service.Delete(id);
                 return Ok(result);
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest();
@@ -123,6 +146,10 @@ namespace WebAPI.Controllers
             {
                 var result = _service.Delete(email);
                 return Ok(result);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

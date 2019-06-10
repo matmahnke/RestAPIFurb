@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Models;
+using WebAPI.Models.Comandas;
 
 namespace WebAPI.Controllers
 {
@@ -62,12 +63,13 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inserir([FromBody]ComandaViewModel Comanda)
+        public async Task<IActionResult> Inserir([FromBody]InfoComandaViewModel Comanda)
         {
             try
             {
-                var result = await _service.Insert(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
-                return Ok(result);
+                var result = await _service.Insert(CustomAutoMapper<Comanda, InfoComandaViewModel>.Map(Comanda));
+                var response = CustomAutoMapper<InfoComandaViewModel, Comanda>.Map(result);
+                return Ok(response);
             }
             catch (BusinessException ex)
             {
@@ -81,12 +83,13 @@ namespace WebAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> Editar(int id, [FromBody]ComandaViewModel Comanda)
+        public async Task<IActionResult> Editar(int id, [FromBody]InfoComandaViewModel Comanda)
         {
             try
             {
-                var result = await _service.Update(CustomAutoMapper<Comanda, ComandaViewModel>.Map(Comanda));
-                return Ok(result);
+                var result = await _service.Update(CustomAutoMapper<Comanda, InfoComandaViewModel>.Map(Comanda));
+                var response = CustomAutoMapper<InfoComandaViewModel, Comanda>.Map(result);
+                return Ok(response);
             }
             catch (BusinessException ex)
             {

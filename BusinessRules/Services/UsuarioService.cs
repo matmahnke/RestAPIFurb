@@ -1,4 +1,5 @@
 ﻿using BusinessRules.Interfaces;
+using BusinessRules.Utils;
 using DTO;
 using Infra;
 using Microsoft.EntityFrameworkCore;
@@ -12,31 +13,61 @@ namespace BusinessRules.Services
 {
     public class UsuarioService : BaseValidator<Usuario>, IUsuarioService
     {
+
+        private readonly IApplicationDbContext _service;
+
+        public UsuarioService(IApplicationDbContext service)
+        {
+            _service = service;
+        }
         public override void Validate(Usuario item)
         {
-            if (string.IsNullOrWhiteSpace(item.Email))
+            emailValido(item.Email);
+            senhaValida(item.Senha);
+
+            base.Validate(item);
+        }
+
+        private void emailValido(string email)
+        {
+
+            if (string.IsNullOrWhiteSpace(email))
             {
-                base.AddError(new ErrorField() { Message = "O campo Senha é obrigatório!", Field = "Email" });
+                base.AddError(new ErrorField() { Message = "O campo Email é obrigatório!", Field = "Email" });
             }
-            if (string.IsNullOrWhiteSpace(item.Email))
+            else if (!email.IsValidEmail())
+            {
+                base.AddError(new ErrorField() { Message = "Email inválido!", Field = "Email" });
+            }
+        }
+
+        private void senhaValida(string senha)
+        {
+            if (string.IsNullOrWhiteSpace(senha))
             {
                 base.AddError(new ErrorField() { Message = "O campo Senha é obrigatório!", Field = "Senha" });
             }
-            base.Validate(item);
         }
+
         public async Task Delete(int id)
         {
-            using (var context = new ApplicationDbContext())
+            using (var context = _service)
             {
-                var result = context.Usuarios.Remove(GetById(id));
+                var user = GetById(id);
+                if (user == null)
+                    base.AddError(new ErrorField() { Message = "Usuário não encontrado!", Field = "Id" });
+                context.Usuarios.Remove(user);
                 await context.SaveChangesAsync();
             }
         }
 
         public async Task Delete(string email)
         {
-            using (var context = new ApplicationDbContext())
+            using (var context = _service)
             {
+                var usuario = context.Usuarios.FirstOrDefault(c => c.Email == email);
+                if (usuario == null)
+                    base.AddError(new ErrorField() { Message = "Usuário não encontrado!", Field = "Email" });
                 var result = context.Usuarios.Remove(await context.Usuarios.
                     FirstOrDefaultAsync(c => c.Email == email));
                 await context.SaveChangesAsync();
@@ -45,7 +76,7 @@ namespace BusinessRules.Services
 
         public IList<Usuario> GetAll()
         {
-            using (var context = new ApplicationDbContext())
+            using (var context = _service)
             {
                 var result = context.Usuarios.AsNoTracking().ToList();
                 return result;
@@ -54,17 +85,22 @@ namespace BusinessRules.Services
 
         public Usuario GetById(int id)
         {
-            using (var context = new ApplicationDbContext())
-            {
-                var result = context.Usuarios.FirstOrDefault(c => c.Id == id);
-                return result;
-            }
+            var result = _service.Usuarios.FirstOrDefault(c => c.Id == id);
+            return result;
         }
 
         public Usuario Filter(string email, string senha)
         {
-            using (var context = new ApplicationDbContext())
+            using (var context = _service)
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    base.AddError(new ErrorField() { Message = "Email obrigatório!", Field = "Email" });
+                }
+                if (string.IsNullOrWhiteSpace(senha))
+                {
+                    base.AddError(new ErrorField() { Message = "O campo Senha é obrigatório!", Field = "Senha" });
+                }
                 var result = context.Usuarios.FirstOrDefault(c => c.Email == email && c.Senha == senha);
                 return result;
             }
@@ -73,20 +109,37 @@ namespace BusinessRules.Services
         public async Task<Usuario> Insert(Usuario usuario)
         {
             Validate(usuario);
-            using (var context = new ApplicationDbContext())
+            Usuario result;
+            using (var context = _service)
             {
-                var result = await context.Usuarios.AddAsync(usuario);
+                result = (await context.Usuarios.AddAsync(usuario)).Entity;
                 await context.SaveChangesAsync();
-                return result.Entity;
             }
+            return result;
         }
 
         public async Task<Usuario> Update(Usuario usuario)
         {
-            Validate(usuario);
-            using (var context = new ApplicationDbContext())
+            var user = GetById(usuario.Id);
+
+            if (!string.IsNullOrEmpty(usuario.Email))
             {
-                var result = context.Usuarios.Update(usuario);
+                emailValido(usuario.Email);
+                user.Email = usuario.Email;
+            }
+
+            if (!string.IsNullOrEmpty(usuario.Senha))
+            {
+                senhaValida(usuario.Senha);
+                user.Senha = usuario.Senha;
+            }
+
+            using (var context = _service)
+            {
+                if (user == null)
+                    base.AddError(new ErrorField() { Message = "Usuário não encontrado!", Field = "Id" });
+
+                var result = context.Usuarios.Update(user);
                 await context.SaveChangesAsync();
                 return result.Entity;
             }

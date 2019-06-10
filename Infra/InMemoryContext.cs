@@ -6,14 +6,13 @@ using System.Text;
 
 namespace Infra
 {
-    public class ApplicationDbContext : DbContext, IApplicationDbContext
+    public class InMemoryContext : DbContext, IApplicationDbContext
     {
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Comanda> Comandas { get; set; }
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public InMemoryContext(DbContextOptions options) : base(options)
         {
         }
-        public ApplicationDbContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

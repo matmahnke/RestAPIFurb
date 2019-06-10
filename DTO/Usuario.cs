@@ -6,8 +6,6 @@ namespace DTO
 {
     public class Usuario : Entity
     {
-        [Key]
-        public int Id { get; set; }
         [Required]
         [MaxLength(50)]
         public string Email { get; set; }

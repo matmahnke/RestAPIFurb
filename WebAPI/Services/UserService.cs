@@ -18,7 +18,7 @@ namespace WebAPI.Services
     public interface IUserService
     {
         Task<AuthUserViewModel> Authenticate(string email, string senha);
-        Task<IEnumerable<UsuarioViewModel>> GetAll();
+        IEnumerable<UsuarioViewModel> GetAll();
     }
 
     public class UserService : IUserService
@@ -64,30 +64,20 @@ namespace WebAPI.Services
 
             };
 
-            try
-            {
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                user.Token = tokenHandler.WriteToken(token);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            user.Token = tokenHandler.WriteToken(token);
 
             return user;
         }
 
-        public async Task<IEnumerable<UsuarioViewModel>> GetAll()
+        public IEnumerable<UsuarioViewModel> GetAll()
         {
-            using (var context = new ApplicationDbContext())
+
+            return _service.GetAll().Select(c => new UsuarioViewModel
             {
-                return await Task.Run(() => context.Usuarios.Select(c => new UsuarioViewModel
-                {
-                    Id = c.Id,
-                    Email = c.Email
-                }));
-            }
+                Id = c.Id,
+                Email = c.Email
+            });
         }
     }
 }

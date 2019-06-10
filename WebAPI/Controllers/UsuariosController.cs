@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Helpers;
 using WebAPI.Models;
+using WebAPI.Models.Usuarios;
 using WebAPI.Services;
 
 namespace WebAPI.Controllers
@@ -37,12 +38,19 @@ namespace WebAPI.Controllers
         [HttpPost("auth")]
         public async Task<IActionResult> Authenticate([FromBody]UsuarioViewModel userParam)
         {
-            var user = await _userService.Authenticate(userParam.Email, userParam.Senha);
+            try
+            {
+                var user = await _userService.Authenticate(userParam.Email, userParam.Senha);
 
-            if (user == null)
-                return BadRequest(new { message = "Usuário ou senha estão incorretos" });
+                if (user == null)
+                    return BadRequest(new { message = "Usuário ou senha estão incorretos" });
 
-            return Ok(user);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
@@ -53,7 +61,7 @@ namespace WebAPI.Controllers
                 var result = _service.GetAll();
                 return Ok(result);
             }
-            catch(BusinessException ex)
+            catch (BusinessException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -84,12 +92,14 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Inserir([FromBody]UsuarioViewModel usuario)
+        public async Task<IActionResult> Inserir([FromBody]InfoUsuarioViewModel usuario)
         {
             try
             {
-                var result = await _service.Insert(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
-                return Ok(result);
+                var result =
+                    await _service.Insert(CustomAutoMapper<Usuario, InfoUsuarioViewModel>.Map(usuario));
+                var response = CustomAutoMapper<UsuarioViewModel, Usuario>.Map(result);
+                return Ok(response);
             }
             catch (BusinessException ex)
             {
@@ -103,12 +113,13 @@ namespace WebAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> Editar(int id, [FromBody]UsuarioViewModel usuario)
+        public async Task<IActionResult> Editar(int id, [FromBody]InfoUsuarioViewModel usuario)
         {
             try
             {
-                var result = await _service.Update(CustomAutoMapper<Usuario, UsuarioViewModel>.Map(usuario));
-                return Ok(result);
+                var result = await _service.Update(CustomAutoMapper<Usuario, InfoUsuarioViewModel>.Map(usuario));
+                var response = CustomAutoMapper<InfoUsuarioViewModel, Usuario>.Map(result);
+                return Ok(response);
             }
             catch (BusinessException ex)
             {
@@ -127,7 +138,7 @@ namespace WebAPI.Controllers
             try
             {
                 var result = _service.Delete(id);
-                return Ok(result);
+                return Ok(new GenericResponse("usuário removido"));
             }
             catch (BusinessException ex)
             {
@@ -140,13 +151,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete]
-        [Route("{email}")]
-        public async Task<IActionResult> Deletar(string email)
+        public async Task<IActionResult> Deletar([FromBody]string email)
         {
             try
             {
                 var result = _service.Delete(email);
-                return Ok(result);
+                return Ok(new GenericResponse("usuário removido"));
             }
             catch (BusinessException ex)
             {

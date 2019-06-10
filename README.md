@@ -10,11 +10,13 @@ Banco de dados:
 > Sql server
 
 Ferramenta ORM:
-> Entity Framework 
+> Entity Framework SqlServer
 
 # Como rodar o projeto?
-Tenha instalado SqlServer na sua máquina
+Com SqlServer developer e dotnet core 2.1
 > Execute "dotnet run" em \WebAPI
+Atente-se à connectionString no AppSettings.json.
+O banco é gerado ao iniciar a aplicação.
 
 Porta padrão: 8080
 

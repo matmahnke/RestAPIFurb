@@ -14,7 +14,7 @@ Ferramenta ORM:
 
 # Como rodar o projeto?
 Com SqlServer developer e dotnet core 2.1
-> Execute "dotnet run" em \WebAPI
+> Execute "dotnet run" em \WebAPI,
 Atente-se à connectionString no AppSettings.json.
 O banco é gerado ao iniciar a aplicação.
 

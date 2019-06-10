@@ -4,13 +4,13 @@
 > Alan Felipe Jantz e Matheus Mahnke
 
 Documentação da api com:
-> swagger
+> Swagger
 
 Banco de dados:
 > Sql server
 
 Ferramenta ORM:
-> Entity Framework Core SqlServer
+> Entity Framework Core
 
 # Como rodar o projeto?
 Com SqlServer developer e dotnet core 2.1

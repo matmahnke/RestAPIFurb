@@ -36,3 +36,6 @@ Porta padrão: 8080
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NTk5MjEwMjAsImV4cCI6MTU2MDUyNTgyMCwiaWF0IjoxNTU5OTIxMDIwfQ._5P1K9HhZ86tRpowGx_QlGD6pcns8TEgNpVD5SMi4Z0"
   }
 ```
+
+# Como rodar os testes?
+>Execute "dotnet test" em \FurbAPI.Integration.Tests

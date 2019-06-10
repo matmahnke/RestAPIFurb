@@ -10,7 +10,7 @@ Banco de dados:
 > Sql server
 
 Ferramenta ORM:
-> Entity Framework SqlServer
+> Entity Framework Core SqlServer
 
 # Como rodar o projeto?
 Com SqlServer developer e dotnet core 2.1

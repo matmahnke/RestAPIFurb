@@ -16,7 +16,7 @@ namespace Infra
         DbSet<Comanda> Comandas { get; set; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         DatabaseFacade Database { get; }
     }

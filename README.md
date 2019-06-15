@@ -4,17 +4,19 @@
 > Alan Felipe Jantz e Matheus Mahnke
 
 Documentação da api com:
-> swagger
+> Swagger
 
 Banco de dados:
 > Sql server
 
 Ferramenta ORM:
-> Entity Framework 
+> Entity Framework Core
 
 # Como rodar o projeto?
-Tenha instalado SqlServer na sua máquina
-> Execute "dotnet run" em \WebAPI
+Com SqlServer developer e dotnet core 2.1
+> Execute "dotnet run" em \WebAPI,
+Atente-se à connectionString no AppSettings.json.
+O banco é gerado ao iniciar a aplicação.
 
 Porta padrão: 8080
 
@@ -34,3 +36,6 @@ Porta padrão: 8080
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE1NTk5MjEwMjAsImV4cCI6MTU2MDUyNTgyMCwiaWF0IjoxNTU5OTIxMDIwfQ._5P1K9HhZ86tRpowGx_QlGD6pcns8TEgNpVD5SMi4Z0"
   }
 ```
+
+# Como rodar os testes?
+>Execute "dotnet test" em \FurbAPI.Integration.Tests
